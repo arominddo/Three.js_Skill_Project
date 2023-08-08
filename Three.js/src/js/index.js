@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import {OrbitControls} from "three/examples/jsm/controls/OrbitControls.js"
 import WebGL from "../../node_modules/three/examples/jsm/capabilities/WebGL.js";
 
 const $result = document.getElementById('result');
@@ -12,8 +13,10 @@ if (WebGL.isWebGLAvailable()) {
 
 
     // 2. Camera: Scene을 바라볼 시점을 결정
-    const camera = new THREE.PerspectiveCamera(50, $result.clientWidth / $result.clientHeight, 0.1, 10000);
-    camera.position.set(2,2,2);
+    // const camera = new THREE.PerspectiveCamera(50, $result.clientWidth / $result.clientHeight, 0.1, 10000);
+    const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 10000);
+
+    camera.position.set(3,3,3);
     camera.lookAt(0,0,0,)
 
 
@@ -28,31 +31,38 @@ if (WebGL.isWebGLAvailable()) {
     scene.add(light);
 
     
-    
+    const geometry = new THREE.DodecahedronGeometry(1);
     const material = new THREE.MeshStandardMaterial({
-        color : 0x2E6FF2
+        color: 0xffaaaa,
     })
+
+    const mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh);
+
+
+    // 1. 위치
+    mesh.position.set(0,2,1);
+
+
+    // 2. 회전
+    mesh.rotation.y = THREE.MathUtils.degToRad(30);
+
+
+
+
+    // axesHelper
+    const axesHelper = new THREE.AxesHelper(10);
+    scene.add(axesHelper);
+
+
+
+    // OrbitControls
+    const controls = new OrbitControls(camera, renderer.domElement);
+
     
-    
-    // 육면체
-    const geo1 = new THREE.BoxGeometry(1,1,1);
-    const obj1 = new THREE.Mesh(geo1, material);
-    // scene.add(obj1);
 
-
-    // 원뿔
-    const geo2 = new THREE.ConeGeometry(0.5,1, 10);
-    const obj2 = new THREE.Mesh(geo2, material);
-    // scene.add(obj2);
-
-
-    // 구
-    const geo4 = new THREE.SphereGeometry(0.3);
-    const obj4 = new THREE.Mesh(geo4, material);
-    // scene.add(obj4);
-
-
-    scene.add(objList);
+    // 조작 설정
+    // controls
 
 
 
@@ -60,6 +70,7 @@ if (WebGL.isWebGLAvailable()) {
         // box.rotation.y += 0.01;
         
         requestAnimationFrame(animate);
+        controls.update();
         renderer.render(scene, camera);
 
     }
