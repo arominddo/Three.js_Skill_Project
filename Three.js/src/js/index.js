@@ -27,18 +27,38 @@ if (WebGL.isWebGLAvailable()) {
     light.position.set(2,4,3);
     scene.add(light);
 
-    const geometry = new THREE.BoxGeometry(1,1,1);
+    
     
     const material = new THREE.MeshStandardMaterial({
         color : 0x2E6FF2
     })
-    const box = new THREE.Mesh(geometry, material);
-    scene.add(box);
+    
+    
+    // 육면체
+    const geo1 = new THREE.BoxGeometry(1,1,1);
+    const obj1 = new THREE.Mesh(geo1, material);
+    // scene.add(obj1);
+
+
+    // 원뿔
+    const geo2 = new THREE.ConeGeometry(0.5,1, 10);
+    const obj2 = new THREE.Mesh(geo2, material);
+    // scene.add(obj2);
+
+
+    // 구
+    const geo4 = new THREE.SphereGeometry(0.3);
+    const obj4 = new THREE.Mesh(geo4, material);
+    // scene.add(obj4);
+
+
+    scene.add(objList);
+
 
 
     function animate() {
-        box.rotation.y += 0.01;
-        console.log(box.rotation.y)
+        // box.rotation.y += 0.01;
+        
         requestAnimationFrame(animate);
         renderer.render(scene, camera);
 
