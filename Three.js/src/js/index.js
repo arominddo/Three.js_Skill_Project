@@ -2,7 +2,11 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
 import WebGL from "../../node_modules/three/examples/jsm/capabilities/WebGL.js";
 import printTree from "./mesh/tree.js";
-import printTangerine from "./mesh/tangerine.js";
+import printHanrabong from "./mesh/hanrabong.js";
+import printMountain from "./mesh/moutain.js";
+import printStone from "./mesh/stone.js";
+
+
 
 if (WebGL.isWebGLAvailable()) {
 
@@ -23,21 +27,62 @@ if (WebGL.isWebGLAvailable()) {
     // 3. Renderer: Scene + Camera, 화면을 그려주는 열할
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
     document.body.appendChild(renderer.domElement);
 
 
-    const light = new THREE.DirectionalLight(0xffffff);
-    light.position.set(2, 4, 3);
+    // 빛 종류 : DirectionalLight, PointLight, SpotLight
+    const light = new THREE.DirectionalLight(0xffffff, 3);
+    light.position.set(2, 6, 3);
     scene.add(light);
 
+    light.castShadow = true;
+    light.shadow.mapSize.width = 1024;
+    light.shadow.mapSize.height = 1024;
+
+    const dlHelper = new THREE.DirectionalLightHelper(light, 1, 0xff0000);
+    scene.add(dlHelper);
+  
+    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
 
 
+    // 도형
     const tree = printTree();
-    const tangerine = printTangerine();
+    tree.position.x = 10;
 
-    scene.add(tangerine);
+    const hanrabong = printHanrabong();
+    hanrabong.position.x = 5;
+    hanrabong.position.y = 1;
+    
+    const mountain = printMountain();
+    mountain.position.y = 0.6;
+    
+    const stone = printStone();
+    stone.position.y = 0.1;
+    stone.position.z = 5;
 
+    scene.add(hanrabong);
     scene.add(tree);
+    scene.add(mountain);
+    scene.add(stone);
+    
+    hanrabong.castShadow = true;
+    tree.castShadow = true;
+    
+
+    const geometry2 = new THREE.PlaneGeometry(100, 100);
+    const material2 = new THREE.MeshStandardMaterial({
+        color: 0x81a8f7,
+        side: THREE.DoubleSide
+    })
+    const plane = new THREE.Mesh(geometry2, material2);
+    plane.rotation.x = Math.PI / -2;
+    plane.position.y = -1;
+    scene.add(plane);
+
+    plane.receiveShadow = true;
+
+
     
 
 
@@ -67,6 +112,7 @@ if (WebGL.isWebGLAvailable()) {
     animate();
 
     window.addEventListener("resize", () => {
+
         // 1. 카메라의 종횡비
         camera.aspect = window.innerWidth / window.innerHeight
         camera.updateProjectionMatrix(); // 카메라 업데이트

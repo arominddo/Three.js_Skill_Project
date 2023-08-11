@@ -8,8 +8,22 @@ export default function printTree() {
     const tree = new THREE.Group();
     const trunk = new THREE.Group();
 
+    const loader = new THREE.TextureLoader();
+    const baseColor = loader.load("./Textures/tree-trunk.jpg");
+    const height = loader.load("./Textures/tree-trunk.jpg");
+    const rough = loader.load("./Textures/tree-trunk.jpg");
+
+
+
     const trunkMaterial = new THREE.MeshStandardMaterial({
-        color: 0xa38049
+        color: 0xa38049,
+        map: baseColor,
+        
+        roughness : 0,
+        roughnessMap : rough,
+        displacementMap : height,
+        displacementScale : 0,
+
     })
 
     const trunkGeometry = new THREE.CylinderGeometry(0.8, 1, 1.5);
@@ -38,9 +52,13 @@ export default function printTree() {
 
     tree.add(trunk)
 
+    const baseColor2 = loader.load("./Textures/green-leaf.jpg");
+    
     const treeLeafMaterial = new THREE.MeshStandardMaterial({
         color: 0x84ad88,
-        side: THREE.DoubleSide
+        side: THREE.DoubleSide,
+        map: baseColor2,
+        transparent: true
     })
 
     const treeLeafGeometry = new THREE.SphereGeometry(2, 32, 16, Math.PI / 3, Math.PI / 3);
@@ -75,10 +93,6 @@ export default function printTree() {
     tree_leaf.position.x = -0.4;
     tree_leaf.rotation.z = THREE.MathUtils.degToRad(-10);
 
-
-    tree.position.x = 2;
-    
-    
     return tree;
 
 }
