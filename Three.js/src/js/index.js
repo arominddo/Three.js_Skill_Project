@@ -1,133 +1,117 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
-import WebGL from "../../node_modules/three/examples/jsm/capabilities/WebGL.js";
-import printTree from "./mesh/tree.js";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+
+import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader.js";
+
+import printIsland from "./mesh/island.js";
 import printHanrabong from "./mesh/hanrabong.js";
-import printMountain from "./mesh/moutain.js";
+import printTree from "./mesh/tree.js";
+import printMountain from "./mesh/mountain.js";
 import printStone from "./mesh/stone.js";
 
+// 장면구조
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x7ccad5);
+
+const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.set(0,10,50);
+camera.lookAt(0,0,0);
+
+const renderer = new THREE.WebGL1Renderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+
+document.body.appendChild(renderer.domElement);
+renderer.shadowMap.enabled = true;
+
+// 도형
+// const geometry = new THREE.BoxGeometry(1,1,1);
+// const material = new THREE.MeshStandardMaterial({
+//     color: 0xffe272
+// })
+
+// const mesh = new THREE.Mesh(geometry, material);
+// scene.add(mesh);
 
 
-if (WebGL.isWebGLAvailable()) {
+const island = printIsland();
+island.position.y = -1.5;
+scene.add(island);
 
-    // 1. Scene: 화면에서 보여주려는 객체를 담는 공간
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xffe287);
-    // scene.add(요소);
+const hanrabong = printHanrabong();
+hanrabong.position.set(-5, 0, -1);
+scene.add(hanrabong);
 
+const miniHanrabong = printHanrabong();
+miniHanrabong.scale.set(0.7, 0.7, 0.7);
+miniHanrabong.position.set(-6, 0, 1.5);
+scene.add(miniHanrabong);
 
-    // 2. Camera: Scene을 바라볼 시점을 결정
-    // const camera = new THREE.PerspectiveCamera(50, $result.clientWidth / $result.clientHeight, 0.1, 10000);
-    const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 10000);
+const tree = printTree();
+tree.position.set(5,-0.5, -1);
+tree.rotation.y = Math.PI / -3;
+scene.add(tree);
 
-    camera.position.set(10, 10, 10);
-    camera.lookAt(0, 0, 0,)
+const miniTree = printTree();
+miniTree.position.set(6,-1, 2);
+miniTree.scale.set(0.6,0.6,0.6);
+scene.add(miniTree);
 
+const mountain = printMountain();
+mountain.scale.set(1.2, 1.6, 1);
+mountain.position.set(0, 1, -2);
+scene.add(mountain);
 
-    // 3. Renderer: Scene + Camera, 화면을 그려주는 열할
-    const renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.shadowMap.enabled = true;
-    document.body.appendChild(renderer.domElement);
+const harbang = printStone();
+harbang.position.set(3,-0.5,1);
+harbang.scale.set(0.9,0.9,0.9)
+harbang.rotation.y = Math.PI / -8;
+scene.add(harbang);
 
-
-    // 빛 종류 : DirectionalLight, PointLight, SpotLight
-    const light = new THREE.DirectionalLight(0xffffff, 3);
-    light.position.set(2, 6, 3);
-    scene.add(light);
-
-    light.castShadow = true;
-    light.shadow.mapSize.width = 1024;
-    light.shadow.mapSize.height = 1024;
-
-    const dlHelper = new THREE.DirectionalLightHelper(light, 1, 0xff0000);
-    scene.add(dlHelper);
-  
-    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-
-
-    // 도형
-    const tree = printTree();
-    tree.position.x = 10;
-
-    const hanrabong = printHanrabong();
-    hanrabong.position.x = 5;
-    hanrabong.position.y = 1;
+const modelLoader = new GLTFLoader();
+modelLoader.load("./src/models/Lycat-3d.glb", (gltf) => {
+    const model = gltf.scene;
+    model.position.set(-3, -1.3, 1);
+    model.rotation.y = Math.PI / 8;
     
-    const mountain = printMountain();
-    mountain.position.y = 0.6;
-    
-    const stone = printStone();
-    stone.position.y = 0.1;
-    stone.position.z = 5;
-
-    scene.add(hanrabong);
-    scene.add(tree);
-    scene.add(mountain);
-    scene.add(stone);
-    
-    hanrabong.castShadow = true;
-    tree.castShadow = true;
-    
-
-    const geometry2 = new THREE.PlaneGeometry(100, 100);
-    const material2 = new THREE.MeshStandardMaterial({
-        color: 0x81a8f7,
-        side: THREE.DoubleSide
-    })
-    const plane = new THREE.Mesh(geometry2, material2);
-    plane.rotation.x = Math.PI / -2;
-    plane.position.y = -1;
-    scene.add(plane);
-
-    plane.receiveShadow = true;
-
-
-    
-
-
-    // axesHelper
-    const axes = new THREE.AxesHelper(10);
-    scene.add(axes);
-
-    
-
-    // OrbitControls
-    const controls = new OrbitControls(camera, renderer.domElement);
-
-
-    // 조작 설정
-    // controls
-
-
-
-    function animate() {
-        // box.rotation.y += 0.01;
-
-        requestAnimationFrame(animate);
-        controls.update();
-        renderer.render(scene, camera);
-
+    for (const mesh of model.children) {
+        mesh.castShadow = true;
     }
-    animate();
-
-    window.addEventListener("resize", () => {
-
-        // 1. 카메라의 종횡비
-        camera.aspect = window.innerWidth / window.innerHeight
-        camera.updateProjectionMatrix(); // 카메라 업데이트
-
-        // 2. 렌더러의 크기
-        renderer.setSize(window.innerWidth, window.innerHeight);
+    scene.add(model);
+})
 
 
 
-    })
+// 빛
+const ambientLight = new THREE.AmbientLight(0xffffff, 2);
+scene.add(ambientLight);
+
+const directionLight = new THREE.DirectionalLight(0xffffff, 2);
+directionLight.position.set(2,1,2);
+scene.add(directionLight);
+directionLight.castShadow = true;
 
 
 
+// OrbitControls
+const control = new OrbitControls(camera, renderer.domElement);
+control.autoRotate = true;
+control.autoRotateSpeed = -1;
+control.minDistance = 5;
+control.maxDistance = 100;
 
-} else {
-    document.body.appendChild(WebGL.getWebGLErrorMessage)
+
+// 연출
+function animate(){
+    control.update();
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+
 }
 
+animate();
+
+window.addEventListener("resize", () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+})

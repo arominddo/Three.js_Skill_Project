@@ -71,6 +71,8 @@ export default function printStone() {
 
   for (const mesh of Stone.children) {
     mesh.castShadow = true;
+    mesh.receiveShadow = true;
+
   }
 
 

@@ -56,5 +56,11 @@ export default function printHanrabong() {
     leaf.rotation.z = Math.PI / -2;
 
 
+    for (const mesh of hanrabong.children) {
+        mesh.receiveShadow = true;
+        mesh.castShadow = true;
+    }
+
+
     return hanrabong;
 }
